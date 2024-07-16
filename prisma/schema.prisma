@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model UserKlien {
+  id            String    @id @default(uuid())
+  fullname      String?
+  email         String
+  password      String
+  nik           BigInt?   @db.BigInt
+  gender        String?
+  address       String?
+  village       String?
+  zipcode       Int?
+  rt            String?
+  rw            String?
+  place         String?
+  birthday      DateTime? @db.Date()
+  job           String?
+  education     String?
+  religion      String?
+  phoneNumber   BigInt?   @db.BigInt
+  otp           String?   @default(dbgenerated("null")) @db.Text
+  refresh_token String?   @default(dbgenerated("null")) @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  letterrequests LetterRequest[]
+  comentars      Comentar[]
+}
+
+model UserAdmin {
+  id            String   @id @default(uuid())
+  name          String
+  username      String
+  password      String
+  nik           String
+  refresh_token String?  @default(dbgenerated("null")) @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  newses        News[]
+  destinations  Destination[]
+  announcements Announcement[]
+  transparencys Transparency[]
+}
+
+model News {
+  news_id        String   @id @default(uuid())
+  title          String
+  content        String   @db.Text
+  description    String
+  thumbnail      String
+  urlToThumbnail String
+  source         String
+  views          BigInt   @default(0) @db.BigInt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  authorId String?
+  author   UserAdmin? @relation(fields: [authorId], references: [id])
+
+  comentars Comentar[]
+}
+
+model Comentar {
+  id              String   @id @default(uuid())
+  comment_content String   @db.Text
+  createdAt       DateTime @default(now())
+
+  newsId String?
+  news   News?   @relation(fields: [newsId], references: [news_id])
+
+  authorId String?
+  author   UserKlien? @relation(fields: [authorId], references: [id])
+}
+
+model Destination {
+  destination_id String   @id @default(uuid())
+  name           String
+  description    String
+  content        String   @db.Text
+  location       String
+  image          String
+  urlToImage     String
+  views          BigInt   @default(0) @db.BigInt
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  authorId String?
+  author   UserAdmin? @relation(fields: [authorId], references: [id])
+}
+
+model LetterRequest {
+  request_id          String   @id @default(uuid())
+  letter_type         String
+  status              String   @default("pending")
+  pdf_file            String
+  urlToPdfFile        String
+  letter_number       String
+  file_pengantar      String?
+  urlPengantar        String?
+  file_kk             String?
+  urlKK               String?
+  file_akte           String?
+  urlAkte             String?
+  file_suratNikah     String?
+  urlSuratNikah       String?
+  file_suratKelahiran String?
+  urlSuratKelahiran   String?
+  file_suratKematian  String?
+  urlSuratKematian    String?
+  file_KTPAyah        String?
+  urlKTPAyah          String?
+  file_KTPIbu         String?
+  urlKTPIbu           String?
+  file_KTPMeninggal   String?
+  urlKTPMeninggal     String?
+  file_KTPPemohon     String?
+  urlKTPPemohon       String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  authorId String?
+  author   UserKlien? @relation(fields: [authorId], references: [id])
+}
+
+model Announcement {
+  announcement_id      String   @id @default(uuid())
+  title                String
+  date_of_announcement DateTime @db.Date
+  description          String   @db.Text
+  file                 String
+  urlToFile            String
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  authorId String?
+  author   UserAdmin? @relation(fields: [authorId], references: [id])
+}
+
+model Transparency {
+  transparency_id     String   @id @default(uuid())
+  title               String
+  date_of_publication DateTime @db.Date
+  apbd_file           String
+  urlToApbdFile       String
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  authorId String?
+  author   UserAdmin? @relation(fields: [authorId], references: [id])
+}
